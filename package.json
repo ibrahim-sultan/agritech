@@ -1,8 +1,33 @@
 {
-  "dependencies": {
-    "chart.js": "^4.5.0",
-    "react-chartjs-2": "^5.3.0",
-    "socket.io": "^4.8.1",
-    "socket.io-client": "^4.8.1"
+  "name": "agrictech-dashboard",
+  "version": "1.0.0",
+  "description": "AgriTech Dashboard - Full Stack Application",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "cd server && npm start",
+    "build": "cd client && npm install && npm run build",
+    "install-server": "cd server && npm install",
+    "install-client": "cd client && npm install",
+    "install-all": "npm run install-server && npm run install-client",
+    "dev": "concurrently \"cd server && npm run dev\" \"cd client && npm start\"",
+    "heroku-postbuild": "npm run install-all && npm run build"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  },
+  "keywords": [
+    "agriculture",
+    "dashboard",
+    "crop-prices",
+    "farming",
+    "react",
+    "nodejs",
+    "mongodb"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.0"
   }
 }

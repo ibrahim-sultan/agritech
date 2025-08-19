@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: agrictech-dashboard
+    env: node
+    plan: free
+    buildCommand: npm run heroku-postbuild
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        fromDatabase:
+          name: agrictech-db
+          property: connectionString
+      - key: CLIENT_URL
+        value: https://agrictech-dashboard.onrender.com
+
+databases:
+  - name: agrictech-db
+    databaseName: agrictech
+    user: agrictech_user

@@ -1,5 +1,8 @@
 import axios from 'axios';
 
+// Network status detection
+const isOnline = () => navigator.onLine;
+
 // Create axios instance with default config
 const api = axios.create({
   baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
@@ -12,11 +15,22 @@ const api = axios.create({
 // Request interceptor
 api.interceptors.request.use(
   (config) => {
+    // Check network status before making request
+    if (!isOnline()) {
+      return Promise.reject(new Error('Network Error: You appear to be offline'));
+    }
+    
     // Add auth token if available
     const token = localStorage.getItem('authToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    
+    // Add debug logging in development
+    if (process.env.REACT_APP_DEBUG === 'true') {
+      console.log(`🌐 API Request: ${config.method?.toUpperCase()} ${config.url}`);
+    }
+    
     return config;
   },
   (error) => {
@@ -27,13 +41,54 @@ api.interceptors.request.use(
 // Response interceptor
 api.interceptors.response.use(
   (response) => {
+    // Add debug logging in development
+    if (process.env.REACT_APP_DEBUG === 'true') {
+      console.log(`✅ API Response: ${response.config.method?.toUpperCase()} ${response.config.url}`, response.data);
+    }
     return response.data;
   },
   (error) => {
-    const message = error.response?.data?.message || error.message || 'Something went wrong';
+    // Enhanced error handling
+    let message = 'Something went wrong';
+    
+    if (!isOnline()) {
+      message = 'Network Error: Please check your internet connection';
+    } else if (error.code === 'ECONNABORTED') {
+      message = 'Network Error: Request timeout - server may be unavailable';
+    } else if (error.code === 'ERR_NETWORK') {
+      message = 'Network Error: Cannot connect to server';
+    } else if (error.response) {
+      // Server responded with error status
+      message = error.response.data?.message || `Server Error: ${error.response.status}`;
+    } else if (error.request) {
+      // Request was made but no response received
+      message = 'Network Error: Server is not responding';
+    } else {
+      // Something else happened
+      message = error.message || 'Unknown error occurred';
+    }
+    
+    // Add debug logging in development
+    if (process.env.REACT_APP_DEBUG === 'true') {
+      console.error(`❌ API Error:`, error);
+    }
+    
     return Promise.reject(new Error(message));
   }
 );
+
+// Network status helper functions
+export const networkUtils = {
+  isOnline,
+  checkServerHealth: async () => {
+    try {
+      const response = await api.get('/health');
+      return { online: true, data: response };
+    } catch (error) {
+      return { online: false, error: error.message };
+    }
+  }
+};
 
 // API endpoints
 export const farmAPI = {

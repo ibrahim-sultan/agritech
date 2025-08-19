@@ -15,7 +15,7 @@ import {
   faChartLine,
   faRefresh
 } from '@fortawesome/free-solid-svg-icons';
-import { cropPriceAPI } from '../../services/api';
+import { cropPriceAPI, networkUtils } from '../../services/api';
 import socketService from '../../services/socket';
 import './Dashboard_new.css';
 
@@ -24,15 +24,34 @@ const Dashboard = () => {
   const [cropPrices, setCropPrices] = useState([]);
   const [priceAnalytics, setPriceAnalytics] = useState([]);
   const [error, setError] = useState(null);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [serverStatus, setServerStatus] = useState(null);
 
   useEffect(() => {
     fetchDashboardData();
+    
+    // Network status listeners
+    const handleOnline = () => {
+      setIsOnline(true);
+      setError(null);
+      fetchDashboardData(); // Retry when back online
+    };
+    
+    const handleOffline = () => {
+      setIsOnline(false);
+      setError('You are currently offline');
+    };
+    
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
     
     // Connect to WebSocket for real-time updates
     socketService.connect();
     socketService.onPriceUpdate(handleRealTimeUpdate);
     
     return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
       socketService.offPriceUpdate(handleRealTimeUpdate);
     };
   }, []);
@@ -42,6 +61,14 @@ const Dashboard = () => {
     setError(null);
     
     try {
+      // Check server health first
+      const healthCheck = await networkUtils.checkServerHealth();
+      setServerStatus(healthCheck);
+      
+      if (!healthCheck.online) {
+        throw new Error('Server is not responding');
+      }
+      
       // Fetch featured crop prices for dashboard
       const featuredPrices = await cropPriceAPI.getFeatured();
       setCropPrices(featuredPrices);
@@ -226,7 +253,16 @@ const Dashboard = () => {
           {error && (
             <div className="error-banner">
               <FontAwesomeIcon icon={faExclamationTriangle} />
-              <span>Using offline data. {error}</span>
+              <span>
+                {isOnline ? 'Using offline data. ' : 'You are offline. '}
+                {error}
+                {!isOnline && ' - Data will refresh when connection is restored.'}
+              </span>
+              {isOnline && serverStatus && !serverStatus.online && (
+                <div className="server-status">
+                  <small>Server Status: Unavailable</small>
+                </div>
+              )}
             </div>
           )}
           

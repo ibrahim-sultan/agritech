@@ -8,7 +8,9 @@
     "install-all": "npm install && cd server && npm install && cd ../client && npm install",
     "build-client": "cd client && npm run build",
     "build": "npm run install-all && npm run build-client",
+    "postinstall": "cd server && npm install && cd ../client && npm install",
     "heroku-postbuild": "npm run build",
+    "render-postbuild": "cd client && npm install && npm run build",
     "dev": "concurrently \"cd server && npm run dev\" \"cd client && npm start\""
   },
   "engines": {

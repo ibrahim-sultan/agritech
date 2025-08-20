@@ -5,10 +5,12 @@ services:
     plan: free
     rootDir: .
     buildCommand: |
-      npm install
+      echo "Installing server dependencies..."
       cd server && npm install
+      echo "Installing client dependencies and building..."
       cd ../client && npm install && npm run build
-    startCommand: node start.js
+      echo "Build completed successfully"
+    startCommand: cd server && node server.js
     healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV

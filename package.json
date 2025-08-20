@@ -5,13 +5,10 @@
   "main": "server/server.js",
   "scripts": {
     "start": "node server/server.js",
-  "build": "cd client && npm install && npm run build",
-  "install-server": "cd server && npm install",
-  "install-client": "cd client && npm install",
-  "install-all": "npm run install-server && npm run install-client",
-  "dev": "concurrently \"cd server && npm run dev\" \"cd client && npm start\"",
-  "heroku-postbuild": "npm run install-all && npm run build",
-  "postinstall": "npm run build"
+    "build-client": "cd client && npm install && npm run build",
+    "build": "npm run build-client",
+    "postinstall": "npm run build-client",
+    "dev": "concurrently \"cd server && npm run dev\" \"cd client && npm start\""
   },
   "engines": {
     "node": ">=14.0.0",

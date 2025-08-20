@@ -3,7 +3,7 @@ services:
     name: agrictech-dashboard
     env: node
     plan: free
-    buildCommand: npm run heroku-postbuild
+    buildCommand: npm install && npm run install-all && npm run build
     startCommand: npm start
     envVars:
       - key: NODE_ENV

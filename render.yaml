@@ -10,16 +10,8 @@ services:
       - key: NODE_ENV
         value: production
       - key: MONGODB_URI
-        fromDatabase:
-          name: agrictech-db
-          property: connectionString
+        value: mongodb+srv://agritech:agritech01@cluster0.bv7n2ce.mongodb.net/agrictech?retryWrites=true&w=majority&appName=Cluster0
       - key: CLIENT_URL
         value: https://agrictech-dashboard.onrender.com
       - key: PORT
         value: 10000
-
-databases:
-  - name: agrictech-db
-    databaseName: agrictech
-    user: agrictech_user
-    plan: free

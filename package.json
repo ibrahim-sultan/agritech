@@ -8,6 +8,7 @@
     "install-all": "npm install && cd server && npm install && cd ../client && npm install",
     "build-client": "cd client && npm run build",
     "build": "npm run install-all && npm run build-client",
+    "postinstall": "cd server && npm install && cd ../client && npm install && npm run build",
     "heroku-postbuild": "npm run build",
     "dev": "concurrently \"cd server && npm run dev\" \"cd client && npm start\""
   },
@@ -35,10 +36,34 @@
     "jsonwebtoken": "^9.0.2",
     "helmet": "^7.0.0",
     "express-rate-limit": "^6.10.0",
-    "socket.io": "^4.7.2"
+    "socket.io": "^4.7.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.15.0",
+    "react-scripts": "5.0.1",
+    "axios": "^1.5.0",
+    "chart.js": "^4.4.0",
+    "react-chartjs-2": "^5.2.0",
+    "date-fns": "^2.30.0",
+    "@fortawesome/fontawesome-svg-core": "^6.4.2",
+    "@fortawesome/free-solid-svg-icons": "^6.4.2",
+    "@fortawesome/react-fontawesome": "^0.2.0",
+    "socket.io-client": "^4.7.2"
   },
   "devDependencies": {
     "concurrently": "^8.2.0",
     "nodemon": "^3.0.1"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }

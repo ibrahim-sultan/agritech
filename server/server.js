@@ -74,17 +74,46 @@ app.get('/api/health', (req, res) => {
 
 // Serve static files from React build in production
 if (process.env.NODE_ENV === 'production') {
-  // Serve static files from the React app build directory
-  app.use(express.static(path.join(__dirname, '../client/build')));
+  const clientBuildPath = path.join(__dirname, '../client/build');
+  const indexPath = path.join(clientBuildPath, 'index.html');
   
-  // Handle React routing, return all requests to React app
-  app.get('*', (req, res) => {
-    // Don't serve index.html for API routes
-    if (req.path.startsWith('/api/')) {
-      return res.status(404).json({ message: 'API endpoint not found' });
-    }
-    res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
-  });
+  console.log('🔍 Looking for client build at:', clientBuildPath);
+  console.log('🔍 Index.html path:', indexPath);
+  
+  // Check if build directory exists
+  const fs = require('fs');
+  if (fs.existsSync(clientBuildPath)) {
+    console.log('✅ Client build directory found');
+    // Serve static files from the React app build directory
+    app.use(express.static(clientBuildPath));
+    
+    // Handle React routing, return all requests to React app
+    app.get('*', (req, res) => {
+      // Don't serve index.html for API routes
+      if (req.path.startsWith('/api/')) {
+        return res.status(404).json({ message: 'API endpoint not found' });
+      }
+      
+      if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+      } else {
+        console.error('❌ index.html not found at:', indexPath);
+        res.status(500).json({ message: 'Client build not found' });
+      }
+    });
+  } else {
+    console.error('❌ Client build directory not found at:', clientBuildPath);
+    // Fallback: serve a basic response
+    app.get('*', (req, res) => {
+      if (req.path.startsWith('/api/')) {
+        return res.status(404).json({ message: 'API endpoint not found' });
+      }
+      res.status(500).json({ 
+        message: 'Client application not available', 
+        buildPath: clientBuildPath 
+      });
+    });
+  }
 } else {
   // Development mode - just handle API 404s
   app.use('*', (req, res) => {

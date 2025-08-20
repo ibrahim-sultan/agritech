@@ -3,11 +3,12 @@ services:
     name: agrictech-dashboard
     env: node
     plan: free
+    rootDir: .
     buildCommand: |
       npm install
       cd server && npm install
       cd ../client && npm install && npm run build
-    startCommand: node server/server.js
+    startCommand: node start.js
     healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV

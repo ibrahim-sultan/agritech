@@ -1,0 +1,44 @@
+{
+  "name": "agrictech-dashboard",
+  "version": "1.0.0",
+  "description": "AgriTech Dashboard - Full Stack Application",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "install-all": "npm install && cd server && npm install && cd ../client && npm install",
+    "build-client": "cd client && npm run build",
+    "build": "npm run build-client",
+    "postinstall": "npm run build-client",
+    "dev": "concurrently \"cd server && npm run dev\" \"cd client && npm start\""
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  },
+  "keywords": [
+    "agriculture",
+    "dashboard",
+    "crop-prices",
+    "farming",
+    "react",
+    "nodejs",
+    "mongodb"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.5.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "helmet": "^7.0.0",
+    "express-rate-limit": "^6.10.0",
+    "socket.io": "^4.7.2"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0",
+    "nodemon": "^3.0.1"
+  }
+}

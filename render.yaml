@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: agrictech-dashboard
+    env: node
+    plan: free
+    buildCommand: npm install && npm run install-all && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        fromDatabase:
+          name: agrictech-db
+          property: connectionString
+      - key: CLIENT_URL
+        value: https://agrictech-dashboard.onrender.com
+      - key: PORT
+        value: 10000
+
+databases:
+  - name: agrictech-db
+    databaseName: agrictech
+    user: agrictech_user
+    plan: free

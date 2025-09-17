@@ -12,11 +12,16 @@ import {
   faArrowUp,
   faArrowDown,
   faMinus,
-  faExclamationTriangle
+  faExclamationTriangle,
+  faEdit,
+  faTrash,
+  faPlus
 } from '@fortawesome/free-solid-svg-icons';
 import PriceChart from '../../components/Charts/PriceChart';
 import MarketComparison from '../../components/UI/MarketComparison';
+import PriceEditModal from '../../components/Admin/PriceEditModal';
 import { cropPriceAPI } from '../../services/api';
+import { usePermissions } from '../../components/ProtectedComponent';
 import socketService from '../../services/socket';
 import './CropPrices.css';
 
@@ -36,6 +41,12 @@ const CropPrices = () => {
   });
   const [searchTerm, setSearchTerm] = useState('');
   const [realTimeUpdates, setRealTimeUpdates] = useState(true);
+  
+  // Admin functionality
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedPrice, setSelectedPrice] = useState(null);
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const { isAdmin, canManage } = usePermissions();
 
   const cropOptions = [
     { value: 'yam', label: 'Yam (Isu)', icon: '🍠' },
@@ -206,6 +217,52 @@ const CropPrices = () => {
   };
 
   const selectedCropData = cropOptions.find(crop => crop.value === selectedCrop);
+
+  // Admin functions
+  const handleEditPrice = (price) => {
+    setSelectedPrice(price);
+    setEditModalOpen(true);
+  };
+
+  const handleDeletePrice = async (priceId) => {
+    if (!window.confirm('Are you sure you want to delete this price entry?')) return;
+    
+    try {
+      await cropPriceAPI.delete(priceId);
+      // Remove from local state
+      setCropPrices(prev => prev.filter(p => p._id !== priceId));
+      // Refresh data
+      fetchCropPrices();
+    } catch (err) {
+      console.error('Error deleting price:', err);
+      alert('Failed to delete price: ' + err.message);
+    }
+  };
+
+  const handleSavePrice = async (priceId, formData) => {
+    try {
+      await cropPriceAPI.update(priceId, formData);
+      // Refresh the data
+      await fetchCropPrices();
+      await fetchPriceAnalytics();
+      await fetchPriceTrends();
+    } catch (err) {
+      throw new Error(err.message || 'Failed to save price');
+    }
+  };
+
+  const handleAddPrice = async (formData) => {
+    try {
+      await cropPriceAPI.create(formData);
+      // Refresh the data
+      await fetchCropPrices();
+      await fetchPriceAnalytics();
+      await fetchPriceTrends();
+      setAddModalOpen(false);
+    } catch (err) {
+      throw new Error(err.message || 'Failed to add price');
+    }
+  };
 
   return (
     <div className="crop-prices-page">
@@ -393,7 +450,18 @@ const CropPrices = () => {
       <div className="prices-list-section">
         <div className="section-header">
           <h3>Current Prices</h3>
-          <span className="prices-count">{cropPrices.length} records</span>
+          <div className="section-actions">
+            {isAdmin && (
+              <button 
+                className="add-price-btn"
+                onClick={() => setAddModalOpen(true)}
+              >
+                <FontAwesomeIcon icon={faPlus} />
+                Add New Price
+              </button>
+            )}
+            <span className="prices-count">{cropPrices.length} records</span>
+          </div>
         </div>
 
         {loading && (
@@ -428,8 +496,28 @@ const CropPrices = () => {
                     <h4>{selectedCropData?.icon} {price.cropName}</h4>
                     <span className="yoruba-name">({price.cropNameYoruba})</span>
                   </div>
-                  <div className="trend-indicator">
-                    {getTrendIcon(price.trend)}
+                  <div className="price-header-actions">
+                    <div className="trend-indicator">
+                      {getTrendIcon(price.trend)}
+                    </div>
+                    {isAdmin && (
+                      <div className="admin-controls">
+                        <button 
+                          className="edit-btn"
+                          onClick={() => handleEditPrice(price)}
+                          title="Edit Price"
+                        >
+                          <FontAwesomeIcon icon={faEdit} />
+                        </button>
+                        <button 
+                          className="delete-btn"
+                          onClick={() => handleDeletePrice(price._id)}
+                          title="Delete Price"
+                        >
+                          <FontAwesomeIcon icon={faTrash} />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -473,6 +561,28 @@ const CropPrices = () => {
           </div>
         )}
       </div>
+      
+      {/* Admin Modals */}
+      {isAdmin && (
+        <>
+          <PriceEditModal 
+            price={selectedPrice}
+            isOpen={editModalOpen}
+            onClose={() => {
+              setEditModalOpen(false);
+              setSelectedPrice(null);
+            }}
+            onSave={handleSavePrice}
+          />
+          
+          <PriceEditModal 
+            price={null} // null for add mode
+            isOpen={addModalOpen}
+            onClose={() => setAddModalOpen(false)}
+            onSave={handleAddPrice}
+          />
+        </>
+      )}
     </div>
   );
 };

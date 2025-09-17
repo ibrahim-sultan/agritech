@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "description": "AgriTech Dashboard Frontend",
   "scripts": {
-     "start": "node server/server.js",
-  "build": "cd client && npm install && npm run build",
-  "postinstall": "npm run build"
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
   "dependencies": {
     "react": "^18.2.0",

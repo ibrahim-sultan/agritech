@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const CropPrice = require('../models/CropPrice');
+const { protect, restrictTo } = require('../middleware/auth');
 
 // Helper function to calculate price trends
 const calculateTrend = (currentPrice, previousPrice) => {
@@ -329,6 +330,62 @@ router.get('/markets/comparison', async (req, res) => {
     res.json(comparison);
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+});
+
+// CREATE /api/crop-prices - Admin creates a new crop price
+router.post('/', protect, restrictTo('admin'), async (req, res) => {
+  try {
+    const doc = await CropPrice.create(req.body);
+
+    // Emit socket update if available
+    try {
+      const io = req.app.get('io');
+      if (io) io.emit('priceUpdate', { type: 'new', data: doc });
+    } catch (_) {}
+
+    res.status(201).json(doc);
+  } catch (error) {
+    res.status(400).json({ message: error.message || 'Failed to create crop price' });
+  }
+});
+
+// UPDATE /api/crop-prices/:id - Admin updates an existing crop price
+router.put('/:id', protect, restrictTo('admin'), async (req, res) => {
+  try {
+    const updates = { ...req.body, lastUpdated: new Date() };
+    const doc = await CropPrice.findByIdAndUpdate(req.params.id, updates, {
+      new: true,
+      runValidators: true
+    });
+    if (!doc) return res.status(404).json({ message: 'Crop price not found' });
+
+    // Emit socket update if available
+    try {
+      const io = req.app.get('io');
+      if (io) io.emit('priceUpdate', { type: 'update', data: doc });
+    } catch (_) {}
+
+    res.json(doc);
+  } catch (error) {
+    res.status(400).json({ message: error.message || 'Failed to update crop price' });
+  }
+});
+
+// DELETE /api/crop-prices/:id - Admin deletes a crop price
+router.delete('/:id', protect, restrictTo('admin'), async (req, res) => {
+  try {
+    const doc = await CropPrice.findByIdAndDelete(req.params.id);
+    if (!doc) return res.status(404).json({ message: 'Crop price not found' });
+
+    try {
+      const io = req.app.get('io');
+      if (io) io.emit('priceUpdate', { type: 'delete', data: { _id: req.params.id } });
+    } catch (_) {}
+
+    res.status(204).send();
+  } catch (error) {
+    res.status(400).json({ message: error.message || 'Failed to delete crop price' });
   }
 });
 

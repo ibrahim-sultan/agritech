@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faHome,
@@ -13,12 +13,18 @@ import {
   faBars,
   faTimes,
   faLightbulb,
-  faGraduationCap
+  faGraduationCap,
+  faSignInAlt,
+  faSignOutAlt,
+  faUser
 } from '@fortawesome/free-solid-svg-icons';
+import { useAuth } from '../../contexts/AuthContext';
 import './Navbar.css';
 
 const Navbar = ({ currentPath }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { isAuthenticated, user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const navigationItems = [
     {
@@ -73,6 +79,12 @@ const Navbar = ({ currentPath }) => {
     setMobileMenuOpen(false);
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+    closeMobileMenu();
+  };
+
   return (
     <nav className="navbar">
       <div className="navbar__container">
@@ -101,8 +113,37 @@ const Navbar = ({ currentPath }) => {
           ))}
         </ul>
 
+        {/* Auth Section */}
+        <div className="navbar__auth">
+          {isAuthenticated ? (
+            <div className="navbar__user-menu">
+              <div className="navbar__user-info">
+                <FontAwesomeIcon icon={faUser} className="navbar__user-icon" />
+                <span className="navbar__user-name">{user?.name || 'User'}</span>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="navbar__logout-btn"
+                title="Logout"
+              >
+                <FontAwesomeIcon icon={faSignOutAlt} />
+              </button>
+            </div>
+          ) : (
+            <div className="navbar__auth-buttons">
+              <Link to="/login" className="navbar__auth-link">
+                <FontAwesomeIcon icon={faSignInAlt} />
+                <span>Login</span>
+              </Link>
+              <Link to="/register" className="navbar__auth-link navbar__auth-link--primary">
+                <span>Register</span>
+              </Link>
+            </div>
+          )}
+        </div>
+
         {/* Mobile Menu Button */}
-        <button 
+        <button
           className="navbar__mobile-toggle"
           onClick={toggleMobileMenu}
           aria-label="Toggle mobile menu"

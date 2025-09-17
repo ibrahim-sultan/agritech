@@ -5,9 +5,9 @@
   "main": "server/server.js",
   "scripts": {
     "start": "node server/server.js",
-    "build-client": "cd client && npm install && npm run build",
+    "build-client": "cd client && npm run build",
     "build": "npm run build-client",
-    "postinstall": "npm run build-client",
+    "heroku-postbuild": "npm run build-client",
     "dev": "concurrently \"cd server && npm run dev\" \"cd client && npm start\""
   },
   "engines": {
@@ -35,7 +35,19 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^7.5.0",
     "pdfkit": "^0.17.2",
-    "socket.io": "^4.7.2"
+    "socket.io": "^4.7.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.15.0",
+    "react-scripts": "5.0.1",
+    "axios": "^1.5.0",
+    "chart.js": "^4.4.0",
+    "react-chartjs-2": "^5.2.0",
+    "date-fns": "^2.30.0",
+    "@fortawesome/fontawesome-svg-core": "^6.4.2",
+    "@fortawesome/free-solid-svg-icons": "^6.4.2",
+    "@fortawesome/react-fontawesome": "^0.2.0",
+    "socket.io-client": "^4.7.2"
   },
   "devDependencies": {
     "concurrently": "^8.2.0",

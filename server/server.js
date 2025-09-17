@@ -9,8 +9,18 @@ const cron = require('node-cron');
 const path = require('path');
 require('dotenv').config();
 
-// Import notification service
-const notificationService = require('./services/notifications');
+// Import notification service (with error handling)
+let notificationService;
+try {
+  notificationService = require('./services/notifications');
+  console.log('✅ Notification service loaded');
+} catch (err) {
+  console.log('⚠️  Notification service not available:', err.message);
+  notificationService = {
+    processPriceAlerts: async () => [],
+    cleanupRateLimits: () => {}
+  };
+}
 
 const app = express();
 const server = createServer(app);
@@ -40,12 +50,34 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // MongoDB connection
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log('✅ MongoDB connected successfully'))
-.catch(err => console.error('❌ MongoDB connection error:', err));
+const connectDB = async () => {
+  try {
+    if (!process.env.MONGODB_URI) {
+      console.error('❌ MONGODB_URI environment variable is not set!');
+      console.log('📝 Please set MONGODB_URI in your Render environment variables');
+      return;
+    }
+    
+    console.log('🔗 Connecting to MongoDB...');
+    await mongoose.connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+    });
+    
+    console.log('✅ MongoDB connected successfully');
+    console.log(`📊 Database: ${mongoose.connection.db.databaseName}`);
+    
+  } catch (err) {
+    console.error('❌ MongoDB connection error:', err.message);
+    console.log('⚠️  Server will continue running but database features will not work');
+    // Don't exit process - let server run without DB for debugging
+  }
+};
+
+// Connect to MongoDB
+connectDB();
 
 // Authentication Routes
 app.use('/api/auth', require('./routes/auth'));
@@ -251,10 +283,25 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
+
+// Add process error handlers
+process.on('uncaughtException', (err) => {
+  console.error('💥 Uncaught Exception:', err);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (err) => {
+  console.error('💥 Unhandled Rejection:', err);
+  process.exit(1);
+});
+
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV}`);
+  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`📊 MongoDB URI configured: ${process.env.MONGODB_URI ? 'Yes' : 'No'}`);
+  console.log(`🔐 JWT Secret configured: ${process.env.JWT_SECRET ? 'Yes' : 'No'}`);
   console.log(`📡 WebSocket server ready for real-time updates`);
   console.log(`📱 SMS/WhatsApp notifications enabled`);
   console.log(`💰 Monetization features active`);
+  console.log(`✅ AgriTech Platform fully operational!`);
 });

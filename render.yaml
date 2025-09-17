@@ -1,21 +1,59 @@
 services:
   - type: web
-    name: agrictech-dashboard
+    name: agrictech-platform
     env: node
     plan: free
-    buildCommand: npm install && npm run install-all && npm run build
+    buildCommand: npm install && npm run build
     startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: 10000
       - key: MONGODB_URI
-        fromDatabase:
-          name: agrictech-db
-          property: connectionString
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: JWT_REFRESH_EXPIRES_IN
+        value: 30d
+      - key: JWT_COOKIE_EXPIRES_IN
+        value: 7
       - key: CLIENT_URL
-        value: https://agrictech-dashboard.onrender.com
-
-databases:
-  - name: agrictech-db
-    databaseName: agrictech
-    user: agrictech_user
+        value: https://agrictech-platform.onrender.com
+      - key: EMAIL_FROM
+        value: noreply@agrictech.com
+      - key: EMAIL_HOST
+        value: smtp.gmail.com
+      - key: EMAIL_PORT
+        value: 587
+      - key: BCRYPT_ROUNDS
+        value: 12
+      - key: RATE_LIMIT_MAX
+        value: 100
+      - key: RATE_LIMIT_WINDOW_MS
+        value: 900000
+      - key: MAX_FILE_SIZE
+        value: 10485760
+      - key: LOG_LEVEL
+        value: info
+      - key: ENABLE_SMS_NOTIFICATIONS
+        value: true
+      - key: ENABLE_EMAIL_NOTIFICATIONS
+        value: true
+      - key: ENABLE_MARKETPLACE
+        value: true
+      - key: ENABLE_TRAINING_SYSTEM
+        value: true
+      - key: ENABLE_PREMIUM_FEATURES
+        value: true
+      - key: FREE_TIER_PRICE_ALERTS
+        value: 3
+      - key: BASIC_TIER_PRICE_ALERTS
+        value: 10
+      - key: MARKETPLACE_COMMISSION_RATE
+        value: 0.05
+      - key: PASSING_SCORE_PERCENTAGE
+        value: 70
+    autoDeploy: true

@@ -114,29 +114,64 @@ if (process.env.NODE_ENV === 'production') {
       }
       res.sendFile(path.join(buildPath, 'index.html'));
     });
-  } else {
-    console.log('❌ No React build found. Available paths checked:');
-    possibleBuildPaths.forEach(p => {
-      console.log(`  - ${p} (exists: ${fs.existsSync(p)})`);
+} else {
+  console.log('❌ No React build found. Available paths checked:');
+  possibleBuildPaths.forEach(p => {
+    console.log(`  - ${p} (exists: ${fs.existsSync(p)})`);
+  });
+  
+  // Serve a simple homepage for non-API routes only
+  app.get('/', (req, res) => {
+    res.json({ 
+      message: 'AgriTech Platform API is running',
+      note: 'React build not found - API endpoints are available',
+      availableEndpoints: [
+        '/api/health',
+        '/api/crop-prices',
+        '/api/auth/register',
+        '/api/auth/login'
+      ]
     });
-    
-    // Fallback - serve a simple message
-    app.get('*', (req, res) => {
-      if (req.path.startsWith('/api/')) {
-        return res.status(404).json({ message: 'API endpoint not found' });
-      }
-      res.json({ 
-        message: 'AgriTech Platform API is running',
-        note: 'React build not found - API endpoints are available'
-      });
-    });
-  }
+  });
+}
 } else {
   // Development mode - just handle API 404s
   app.use('*', (req, res) => {
-    res.status(404).json({ message: 'API endpoint not found' });
+    if (req.path.startsWith('/api/')) {
+      return res.status(404).json({ message: 'API endpoint not found' });
+    }
+    res.json({ 
+      message: 'AgriTech Platform - Development Mode',
+      availableEndpoints: [
+        '/api/health',
+        '/api/crop-prices',
+        '/api/auth/register',
+        '/api/auth/login'
+      ]
+    });
   });
 }
+
+// Final catch-all for any remaining routes
+app.use('*', (req, res) => {
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ 
+      status: 'fail',
+      message: 'API endpoint not found',
+      requestedPath: req.path
+    });
+  }
+  res.json({ 
+    message: 'AgriTech Platform is running',
+    status: 'success',
+    availableEndpoints: [
+      '/api/health',
+      '/api/crop-prices',
+      '/api/auth/register',
+      '/api/auth/login'
+    ]
+  });
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {

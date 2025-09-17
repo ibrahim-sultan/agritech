@@ -84,17 +84,53 @@ app.get('/api/health', (req, res) => {
 
 // Serve static files from React build in production
 if (process.env.NODE_ENV === 'production') {
-  // Serve static files from the React app build directory
-  app.use(express.static(path.join(__dirname, '../client/build')));
+  // Try different possible build directories
+  const possibleBuildPaths = [
+    path.join(__dirname, '../client/build'),
+    path.join(process.cwd(), 'client/build'),
+    path.join(process.cwd(), 'build')
+  ];
   
-  // Handle React routing, return all requests to React app
-  app.get('*', (req, res) => {
-    // Don't serve index.html for API routes
-    if (req.path.startsWith('/api/')) {
-      return res.status(404).json({ message: 'API endpoint not found' });
+  let buildPath = null;
+  const fs = require('fs');
+  
+  for (const possiblePath of possibleBuildPaths) {
+    if (fs.existsSync(path.join(possiblePath, 'index.html'))) {
+      buildPath = possiblePath;
+      console.log(`✅ Found React build at: ${buildPath}`);
+      break;
     }
-    res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
-  });
+  }
+  
+  if (buildPath) {
+    // Serve static files from the React app build directory
+    app.use(express.static(buildPath));
+    
+    // Handle React routing, return all requests to React app
+    app.get('*', (req, res) => {
+      // Don't serve index.html for API routes
+      if (req.path.startsWith('/api/')) {
+        return res.status(404).json({ message: 'API endpoint not found' });
+      }
+      res.sendFile(path.join(buildPath, 'index.html'));
+    });
+  } else {
+    console.log('❌ No React build found. Available paths checked:');
+    possibleBuildPaths.forEach(p => {
+      console.log(`  - ${p} (exists: ${fs.existsSync(p)})`);
+    });
+    
+    // Fallback - serve a simple message
+    app.get('*', (req, res) => {
+      if (req.path.startsWith('/api/')) {
+        return res.status(404).json({ message: 'API endpoint not found' });
+      }
+      res.json({ 
+        message: 'AgriTech Platform API is running',
+        note: 'React build not found - API endpoints are available'
+      });
+    });
+  }
 } else {
   // Development mode - just handle API 404s
   app.use('*', (req, res) => {

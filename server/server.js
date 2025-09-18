@@ -28,7 +28,8 @@ const io = new Server(server, {
   cors: {
     origin: [
       process.env.CLIENT_URL || "http://localhost:3000",
-      "https://agrictech01.netlify.app", // Your actual Netlify URL
+      "https://agrictech01.netlify.app", // Main dashboard app
+      "https://agrictech0.netlify.app", // Landing page
       "http://localhost:3000",
       "http://localhost:3001"
     ],
@@ -55,7 +56,8 @@ app.use(limiter);
 const corsOptions = {
     origin: [
       process.env.CLIENT_URL || "http://localhost:3000",
-      "https://agrictech01.netlify.app", // Your actual Netlify URL
+      "https://agrictech01.netlify.app", // Main dashboard app
+      "https://agrictech0.netlify.app", // Landing page
       "http://localhost:3000",
       "http://localhost:3001"
     ],

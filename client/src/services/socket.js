@@ -11,11 +11,12 @@ class SocketService {
       return this.socket;
     }
 
-    const serverUrl = process.env.REACT_APP_API_URL?.replace('/api', '') || (
-      process.env.NODE_ENV === 'production' 
-        ? window.location.origin  // Use current domain in production
-        : 'http://localhost:5000'
-    );
+    const serverUrl = process.env.REACT_APP_WS_URL || 
+      process.env.REACT_APP_API_URL?.replace('/api', '') || (
+        process.env.NODE_ENV === 'production' 
+          ? window.location.origin  // Fallback to current domain in production
+          : 'http://localhost:5000'
+      );
     
     this.socket = io(serverUrl, {
       transports: ['websocket', 'polling'],

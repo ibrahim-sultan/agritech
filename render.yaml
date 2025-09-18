@@ -1,10 +1,12 @@
 services:
   - type: web
-    name: agrictech-platform
+    name: agrictech-api
     env: node
     plan: free
+    rootDir: ./server
     buildCommand: npm install
     startCommand: npm start
+    healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
         value: production
@@ -21,7 +23,7 @@ services:
       - key: JWT_COOKIE_EXPIRES_IN
         value: 7
       - key: CLIENT_URL
-        value: https://agrictech-platform.onrender.com
+        value: https://your-frontend-domain.netlify.app
       - key: EMAIL_FROM
         value: noreply@agrictech.com
       - key: EMAIL_HOST

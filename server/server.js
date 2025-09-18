@@ -26,8 +26,15 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
-    methods: ["GET", "POST"]
+    origin: [
+      process.env.CLIENT_URL || "http://localhost:3000",
+      "https://your-frontend-app.netlify.app", // Add your frontend URL here
+      "https://your-frontend-app.vercel.app",  // Or Vercel URL
+      "http://localhost:3000",
+      "http://localhost:3001"
+    ],
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
 
@@ -45,7 +52,20 @@ const limiter = process.env.NODE_ENV === 'production' ? rateLimit({
 // Middleware
 app.use(helmet());
 app.use(limiter);
-app.use(cors());
+// CORS configuration for multiple origins
+const corsOptions = {
+  origin: [
+    process.env.CLIENT_URL || "http://localhost:3000",
+    "https://your-frontend-app.netlify.app", // Replace with your actual frontend URL
+    "https://your-frontend-app.vercel.app",  // Or replace with your Vercel URL
+    "http://localhost:3000",
+    "http://localhost:3001"
+  ],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -114,75 +134,26 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Serve static files from React build in production
-if (process.env.NODE_ENV === 'production') {
-  // Try different possible build directories
-  const possibleBuildPaths = [
-    path.join(__dirname, '../client/build'),
-    path.join(process.cwd(), 'client/build'),
-    path.join(process.cwd(), 'build')
-  ];
-  
-  let buildPath = null;
-  const fs = require('fs');
-  
-  for (const possiblePath of possibleBuildPaths) {
-    if (fs.existsSync(path.join(possiblePath, 'index.html'))) {
-      buildPath = possiblePath;
-      console.log(`✅ Found React build at: ${buildPath}`);
-      break;
-    }
-  }
-  
-  if (buildPath) {
-    // Serve static files from the React app build directory
-    app.use(express.static(buildPath));
-    
-    // Handle React routing, return all requests to React app
-    app.get('*', (req, res) => {
-      // Don't serve index.html for API routes
-      if (req.path.startsWith('/api/')) {
-        return res.status(404).json({ message: 'API endpoint not found' });
-      }
-      res.sendFile(path.join(buildPath, 'index.html'));
-    });
-} else {
-  console.log('❌ No React build found. Available paths checked:');
-  possibleBuildPaths.forEach(p => {
-    console.log(`  - ${p} (exists: ${fs.existsSync(p)})`);
+// API-only server - Frontend deployed separately
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'AgriTech Platform API Server',
+    status: 'running',
+    version: '2.0.0',
+    documentation: 'https://github.com/your-repo/agrictech-platform',
+    frontend: process.env.CLIENT_URL || 'Deploy frontend separately',
+    availableEndpoints: [
+      'GET /api/health',
+      'GET /api/crop-prices',
+      'POST /api/auth/register',
+      'POST /api/auth/login',
+      'GET /api/marketplace',
+      'GET /api/training',
+      'GET /api/premium'
+    ],
+    timestamp: new Date().toISOString()
   });
-  
-  // Serve a simple homepage for non-API routes only
-  app.get('/', (req, res) => {
-    res.json({ 
-      message: 'AgriTech Platform API is running',
-      note: 'React build not found - API endpoints are available',
-      availableEndpoints: [
-        '/api/health',
-        '/api/crop-prices',
-        '/api/auth/register',
-        '/api/auth/login'
-      ]
-    });
-  });
-}
-} else {
-  // Development mode - just handle API 404s
-  app.use('*', (req, res) => {
-    if (req.path.startsWith('/api/')) {
-      return res.status(404).json({ message: 'API endpoint not found' });
-    }
-    res.json({ 
-      message: 'AgriTech Platform - Development Mode',
-      availableEndpoints: [
-        '/api/health',
-        '/api/crop-prices',
-        '/api/auth/register',
-        '/api/auth/login'
-      ]
-    });
-  });
-}
+});
 
 // Final catch-all for any remaining routes
 app.use('*', (req, res) => {

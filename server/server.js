@@ -28,8 +28,7 @@ const io = new Server(server, {
   cors: {
     origin: [
       process.env.CLIENT_URL || "http://localhost:3000",
-      "https://your-frontend-app.netlify.app", // Add your frontend URL here
-      "https://your-frontend-app.vercel.app",  // Or Vercel URL
+      "https://agrictech01.netlify.app", // Your actual Netlify URL
       "http://localhost:3000",
       "http://localhost:3001"
     ],
@@ -54,13 +53,12 @@ app.use(helmet());
 app.use(limiter);
 // CORS configuration for multiple origins
 const corsOptions = {
-  origin: [
-    process.env.CLIENT_URL || "http://localhost:3000",
-    "https://your-frontend-app.netlify.app", // Replace with your actual frontend URL
-    "https://your-frontend-app.vercel.app",  // Or replace with your Vercel URL
-    "http://localhost:3000",
-    "http://localhost:3001"
-  ],
+    origin: [
+      process.env.CLIENT_URL || "http://localhost:3000",
+      "https://agrictech01.netlify.app", // Your actual Netlify URL
+      "http://localhost:3000",
+      "http://localhost:3001"
+    ],
   credentials: true,
   optionsSuccessStatus: 200
 };
@@ -124,39 +122,26 @@ app.use('/api/sensors', require('./routes/sensors'));
 app.use('/api/analytics', require('./routes/analytics'));
 app.use('/api/alerts', require('./routes/alerts'));
 
+// Serve static files from React build (in production)
+if (process.env.NODE_ENV === 'production') {
+  // Serve static files from client build directory
+  app.use(express.static(path.join(__dirname, '../client/build')));
+}
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'OK', 
     message: 'AgriTech Dashboard API is running',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
+    environment: process.env.NODE_ENV || 'development',
+    mode: process.env.NODE_ENV === 'production' ? 'Fullstack (API + React)' : 'API Only'
   });
 });
 
-// API-only server - Frontend deployed separately
-app.get('/', (req, res) => {
-  res.json({ 
-    message: 'AgriTech Platform API Server',
-    status: 'running',
-    version: '2.0.0',
-    documentation: 'https://github.com/your-repo/agrictech-platform',
-    frontend: process.env.CLIENT_URL || 'Deploy frontend separately',
-    availableEndpoints: [
-      'GET /api/health',
-      'GET /api/crop-prices',
-      'POST /api/auth/register',
-      'POST /api/auth/login',
-      'GET /api/marketplace',
-      'GET /api/training',
-      'GET /api/premium'
-    ],
-    timestamp: new Date().toISOString()
-  });
-});
-
-// Final catch-all for any remaining routes
-app.use('*', (req, res) => {
+// Handle client-side routing - serve React app for non-API routes
+app.get('*', (req, res) => {
+  // If it's an API request, return 404
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ 
       status: 'fail',
@@ -164,16 +149,24 @@ app.use('*', (req, res) => {
       requestedPath: req.path
     });
   }
-  res.json({ 
-    message: 'AgriTech Platform is running',
-    status: 'success',
-    availableEndpoints: [
-      '/api/health',
-      '/api/crop-prices',
-      '/api/auth/register',
-      '/api/auth/login'
-    ]
-  });
+  
+  // In production, serve the React app for all non-API routes
+  if (process.env.NODE_ENV === 'production') {
+    res.sendFile(path.join(__dirname, '../client/build/index.html'));
+  } else {
+    // In development, show API info
+    res.json({ 
+      message: 'AgriTech Platform API Server',
+      status: 'running',
+      note: 'Frontend should be running on http://localhost:3000',
+      availableEndpoints: [
+        '/api/health',
+        '/api/crop-prices',
+        '/api/auth/register',
+        '/api/auth/login'
+      ]
+    });
+  }
 });
 
 // Error handling middleware

@@ -1,10 +1,9 @@
 services:
   - type: web
-    name: agrictech-api
+    name: agrictech-fullstack
     env: node
     plan: free
-    rootDir: ./server
-    buildCommand: npm install
+    buildCommand: npm install && npm run build
     startCommand: npm start
     healthCheckPath: /api/health
     envVars:
@@ -23,7 +22,7 @@ services:
       - key: JWT_COOKIE_EXPIRES_IN
         value: 7
       - key: CLIENT_URL
-        value: https://your-frontend-domain.netlify.app
+        value: https://agrictech-fullstack.onrender.com
       - key: EMAIL_FROM
         value: noreply@agrictech.com
       - key: EMAIL_HOST

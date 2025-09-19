@@ -1,0 +1,36 @@
+=== RENDER ENVIRONMENT VARIABLES ===
+Copy these to Render's Environment tab:
+
+REQUIRED VARIABLES:
+NODE_ENV=production
+PORT=10000
+MONGODB_URI=mongodb+srv://agrictech-user:YOUR_PASSWORD_HERE@cluster0.xxxxx.mongodb.net/agrictech?retryWrites=true&w=majority
+JWT_SECRET=4ef801d1408c661784160d084255889e6fea92a060643f8cc7fcf00740bf79326d9a52f4348c4bdefd034613d385f2fa94c09c2cbe4686bccad04a0547a13639
+CLIENT_URL=https://your-frontend-url.netlify.app
+
+OPTIONAL BUT RECOMMENDED:
+JWT_EXPIRES_IN=7d
+JWT_REFRESH_EXPIRES_IN=30d
+JWT_COOKIE_EXPIRES_IN=7
+EMAIL_FROM=noreply@agrictech.com
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+BCRYPT_ROUNDS=12
+RATE_LIMIT_MAX=100
+RATE_LIMIT_WINDOW_MS=900000
+MAX_FILE_SIZE=10485760
+LOG_LEVEL=info
+ENABLE_SMS_NOTIFICATIONS=true
+ENABLE_EMAIL_NOTIFICATIONS=true
+ENABLE_MARKETPLACE=true
+ENABLE_TRAINING_SYSTEM=true
+ENABLE_PREMIUM_FEATURES=true
+FREE_TIER_PRICE_ALERTS=3
+BASIC_TIER_PRICE_ALERTS=10
+MARKETPLACE_COMMISSION_RATE=0.05
+PASSING_SCORE_PERCENTAGE=70
+
+=== INSTRUCTIONS ===
+1. Replace YOUR_PASSWORD_HERE with your MongoDB Atlas password
+2. Replace your-frontend-url.netlify.app with your actual frontend URL (after you deploy it)
+3. Copy each line as: KEY=value (no quotes needed in Render dashboard)

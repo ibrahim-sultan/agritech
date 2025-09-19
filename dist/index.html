@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Igbaja AgriTech - Your Farming Companion</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <span class="brand-icon">🌾</span>
+                <span class="brand-text">Igbaja AgriTech</span>
+            </div>
+            <div class="nav-menu">
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#about" class="nav-link">About</a>
+                <a href="#contact" class="nav-link">Contact</a>
+                <button class="btn-primary" onclick="showLoginModal()">Login</button>
+                <button class="btn-secondary" onclick="showRegisterModal()">Register</button>
+            </div>
+            <div class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <main class="main-content">
+        <div class="hero-section">
+            <div class="hero-content">
+                <h1 class="hero-title">Kaabo si Igbaja AgriTech! 👋</h1>
+                <p class="hero-subtitle">Welcome to your farming companion. Get real-time crop prices, weather updates, and learn new skills.</p>
+                
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <i data-lucide="calendar"></i>
+                        <span>12/08/2025</span>
+                    </div>
+                    <div class="stat-item">
+                        <i data-lucide="smartphone"></i>
+                        <span>Mobile Optimized</span>
+                    </div>
+                    <div class="stat-item">
+                        <i data-lucide="users"></i>
+                        <span>1,247 Active Users</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="hero-image">
+                <i data-lucide="trending-up" class="hero-icon"></i>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-card blue">
+                    <div class="stat-icon">
+                        <i data-lucide="users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 class="stat-number">1,247</h3>
+                        <p class="stat-label">Active Users</p>
+                        <p class="stat-change positive">+12% this week</p>
+                    </div>
+                </div>
+
+                <div class="stat-card green">
+                    <div class="stat-icon">
+                        <i data-lucide="trending-up"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 class="stat-number">156</h3>
+                        <p class="stat-label">Crop Price Updates</p>
+                        <p class="stat-change">Updated today</p>
+                    </div>
+                </div>
+
+                <div class="stat-card orange">
+                    <div class="stat-icon">
+                        <i data-lucide="alert-triangle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 class="stat-number">3</h3>
+                        <p class="stat-label">Weather Alerts</p>
+                        <p class="stat-change">Active alerts</p>
+                    </div>
+                </div>
+
+                <div class="stat-card purple">
+                    <div class="stat-icon">
+                        <i data-lucide="graduation-cap"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 class="stat-number">89</h3>
+                        <p class="stat-label">Training Completed</p>
+                        <p class="stat-change positive">+23 this month</p>
+                    </div>
+                </div>
+
+                <div class="stat-card indigo">
+                    <div class="stat-icon">
+                        <i data-lucide="book-open"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 class="stat-number">45</h3>
+                        <p class="stat-label">Farming Tips</p>
+                        <p class="stat-change positive">5 new this week</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Features Section -->
+    <section id="features" class="features-section">
+        <div class="container">
+            <h2 class="section-title">What We Offer</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i data-lucide="bar-chart-3" class="feature-icon"></i>
+                    <h3>Real-time Crop Prices</h3>
+                    <p>Get live prices from Igbaja, Ilorin, and Offa markets. Make informed selling decisions.</p>
+                </div>
+                <div class="feature-card">
+                    <i data-lucide="cloud-rain" class="feature-icon"></i>
+                    <h3>Weather Updates</h3>
+                    <p>Stay ahead with accurate weather forecasts and farming alerts for your area.</p>
+                </div>
+                <div class="feature-card">
+                    <i data-lucide="graduation-cap" class="feature-icon"></i>
+                    <h3>Skills Training</h3>
+                    <p>Learn modern farming techniques and improve your agricultural knowledge.</p>
+                </div>
+                <div class="feature-card">
+                    <i data-lucide="smartphone" class="feature-icon"></i>
+                    <h3>Mobile Friendly</h3>
+                    <p>Access all features on your phone. Works perfectly on any device.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Welcome Back</h2>
+                <span class="close" onclick="closeLoginModal()">&times;</span>
+            </div>
+            <form class="auth-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="btn-auth">Sign In</button>
+                <p class="auth-switch">Don't have an account? <a href="#" onclick="switchToRegister()">Register here</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Join Igbaja AgriTech</h2>
+                <span class="close" onclick="closeRegisterModal()">&times;</span>
+            </div>
+            <form class="auth-form" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" name="fullName" required>
+                </div>
+                <div class="form-group">
+                    <label for="regEmail">Email</label>
+                    <input type="email" id="regEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">Password</label>
+                    <input type="password" id="regPassword" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required>
+                </div>
+                <button type="submit" class="btn-auth">Create Account</button>
+                <p class="auth-switch">Already have an account? <a href="#" onclick="switchToLogin()">Sign in here</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Redirecting to dashboard...</p>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>

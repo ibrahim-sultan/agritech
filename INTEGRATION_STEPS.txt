@@ -1,0 +1,70 @@
+🔗 FRONTEND-BACKEND INTEGRATION STEPS
+
+✅ COMPLETED:
+- Backend deployed: https://agrictech-3rfg.onrender.com
+- Frontend deployed: https://agrictech01.netlify.app
+- CORS updated to allow Netlify domain
+- Environment variables prepared
+
+🎯 NEXT STEPS TO COMPLETE INTEGRATION:
+
+1. UPDATE NETLIFY ENVIRONMENT VARIABLES:
+   Go to Netlify Dashboard → Your Site → Site Settings → Environment Variables
+   Add these variables:
+
+   REACT_APP_API_URL=https://agrictech-3rfg.onrender.com/api
+   REACT_APP_WS_URL=https://agrictech-3rfg.onrender.com
+   REACT_APP_ENV=production
+   REACT_APP_DEBUG=false
+
+2. UPDATE RENDER ENVIRONMENT VARIABLES:
+   Go to Render Dashboard → Your Service → Environment
+   Add or update:
+
+   CLIENT_URL=https://agrictech01.netlify.app
+   (This tells the backend which frontend domain to trust)
+
+3. REDEPLOY BOTH SERVICES:
+   - Netlify will auto-redeploy when you save environment variables
+   - Render has already redeployed with latest code changes
+
+4. TEST THE INTEGRATION:
+   Visit: https://agrictech01.netlify.app
+   
+   ✅ Check if the app loads without JavaScript errors
+   ✅ Open browser developer tools → Network tab
+   ✅ Try features that make API calls
+   ✅ Verify API calls go to: https://agrictech-3rfg.onrender.com/api/*
+
+5. VERIFY WEBSOCKET CONNECTION:
+   ✅ Open browser console
+   ✅ Look for: "🔌 Connected to WebSocket server" message
+   ✅ Should connect to: https://agrictech-3rfg.onrender.com
+
+🚨 TROUBLESHOOTING TIPS:
+
+If you see CORS errors:
+- Verify CLIENT_URL is set in Render
+- Check browser console for exact error message
+- Make sure both services are deployed with latest code
+
+If API calls fail:
+- Check Network tab in browser dev tools
+- Verify environment variables in Netlify
+- Test API directly: https://agrictech-3rfg.onrender.com/api/health
+
+If the app shows "You need to enable JavaScript":
+- This is normal - the app requires JavaScript to run
+- Make sure JavaScript is enabled in your browser
+
+📋 YOUR CURRENT URLS:
+Frontend: https://agrictech01.netlify.app
+Backend:  https://agrictech-3rfg.onrender.com
+API:      https://agrictech-3rfg.onrender.com/api
+
+🎉 ONCE COMPLETE:
+Your AgriTech platform will be fully operational with:
+- Frontend hosted on Netlify (fast CDN)
+- Backend API hosted on Render (auto-scaling)
+- Separate deployment pipeline
+- Professional architecture

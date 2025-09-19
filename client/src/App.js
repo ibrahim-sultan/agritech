@@ -111,7 +111,7 @@ const AppRoutes = () => {
 function App() {
   return (
     <AuthProvider>
-      <Router>
+      <Router basename="/dashboard">
         <AppRoutes />
       </Router>
     </AuthProvider>

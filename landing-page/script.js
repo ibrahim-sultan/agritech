@@ -1,7 +1,7 @@
 // Configuration
 const CONFIG = {
     API_BASE_URL: 'https://agrictech-3rfg.onrender.com/api',
-    MAIN_APP_URL: 'https://agrictech01.netlify.app/',
+    MAIN_APP_URL: 'https://agrictech0.netlify.app/',
     STORAGE_KEY: 'agrictech_auth_token'
 };
 
